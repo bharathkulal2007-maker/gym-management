@@ -1,26 +1,473 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Gym Management</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #f4f4f4;
-      margin: 0;
-      padding: 50px;
-    }
-    h1 {
-      color: #2c3e50;
-    }
-    p {
-      color: #555;
-    }
-  </style>
-</head>
-<body>
-  <h1>Welcome to Gym Galaxy</h1>
-  <p>This is the homepage of my Gym Management project.</p>
-</body>
-</html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gym Galaxy - Management System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-animated"></div>
+
+    <div class="language-toggle">
+      <button id="lang-en" class="glow-button active">EN</button>
+      <button id="lang-kn" class="glow-button">ಕನ್</button>
+    </div>
+
+    <main>
+      <!-- Login Screen -->
+      <section id="login-section" class="card login-card fade-in">
+        <h1 class="app-title" data-i18n="appTitle">Gym Galaxy</h1>
+        <p class="subtitle" data-i18n="welcome">Welcome back, Champion!</p>
+        
+        <!-- Login/Register Toggle -->
+        <div style="display: flex; gap: 8px; margin-bottom: 20px; justify-content: center;">
+          <button id="show-login-btn" class="glow-button active" style="padding: 8px 16px;">Log In</button>
+          <button id="show-signup-btn" class="glow-button" style="padding: 8px 16px;">Create Account</button>
+        </div>
+        
+        <!-- Login Form -->
+        <form id="login-form">
+          <div class="input-group">
+            <label for="username" data-i18n="username">Username</label>
+            <input id="username" type="text" autocomplete="username" required />
+          </div>
+          <div class="input-group">
+            <label for="password" data-i18n="password">Password</label>
+            <input id="password" type="password" autocomplete="current-password" required />
+          </div>
+          <button type="submit" class="glow-button wide" data-i18n="login">
+            Login
+          </button>
+          <p id="login-error" class="error-text"></p>
+          <p class="hint">
+    
+          </p>
+        </form>
+        
+        <!-- Signup Form -->
+        <form id="signup-form" class="hidden">
+          <div class="input-group">
+            <label for="signup-name">Name</label>
+            <input id="signup-name" name="name" type="text" required />
+          </div>
+          <div class="grid-2">
+            <div class="input-group">
+              <label for="signup-age">Age</label>
+              <input id="signup-age" name="age" type="number" required />
+            </div>
+            <div class="input-group">
+              <label for="signup-email">Email</label>
+              <input id="signup-email" name="email" type="email" required />
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="signup-phone">Phone Number</label>
+            <input id="signup-phone" name="phone" type="tel" required />
+            <button type="button" id="send-otp-btn" class="glow-button small">Send OTP</button>
+          </div>
+          <div class="input-group" id="otp-group" style="display: none;">
+            <label for="signup-otp">OTP</label>
+            <input id="signup-otp" name="otp" type="text" required />
+          </div>
+          <div class="input-group">
+            <label for="signup-fitness-goal">Fitness Goal</label>
+            <input id="signup-fitness-goal" name="fitnessGoal" type="text" />
+          </div>
+          <div class="input-group">
+            <label for="signup-membership">Membership Type</label>
+            <input id="signup-membership" name="membershipType" type="text" required placeholder="e.g., 1months, 3months, 6months" />
+          </div>
+          <div class="input-group">
+            <label for="signup-photo">Profile Photo (optional)</label>
+            <input id="signup-photo" name="profilePhoto" type="file" accept="image/*" />
+          </div>
+          <button type="submit" class="glow-button wide">Create Account</button>
+          <p id="signup-error" class="error-text"></p>
+          <p id="signup-success" class="hint" style="color: #58ffde; display: none;"></p>
+        </form>
+      </section>
+
+      <!-- Dashboard -->
+      <section id="dashboard-section" class="hidden fade-in">
+        <nav class="top-nav slide-down">
+          <div class="brand">Gym Galaxy</div>
+          <div class="nav-tabs">
+            <button class="nav-tab active" data-target="overview" data-i18n="tabOverview">
+              Dashboard
+            </button>
+            <button class="nav-tab" data-target="profile" id="profile-tab" style="display: none;">
+              My Profile
+            </button>
+            <button class="nav-tab" data-target="members" data-i18n="tabMembers" id="members-tab" style="display: none;">
+              Members
+            </button>
+            <button class="nav-tab" data-target="trainers" data-i18n="tabTrainers">
+              Trainers
+            </button>
+            <button class="nav-tab" data-target="workouts" data-i18n="tabWorkouts">
+              Workout Plans
+            </button>
+            <button class="nav-tab" data-target="videos" data-i18n="tabVideos">
+              Video Gallery
+            </button>
+            <button class="nav-tab" data-target="photos" data-i18n="tabPhotos">
+              Photo Gallery
+            </button>
+            <button class="nav-tab" data-target="chat" data-i18n="tabChat">
+              Group Chat
+            </button>
+          </div>
+          <div class="nav-right">
+            <span id="current-user"></span>
+            <button id="logout-btn" class="nav-logout glow-button" data-i18n="logout">
+              Logout
+            </button>
+          </div>
+        </nav>
+
+        <!-- Overview -->
+        <section id="panel-overview" class="panel active slide-fade">
+          <h2 data-i18n="overviewTitle">Dashboard Analytics</h2>
+          <div id="notifications-container" style="margin-bottom: 16px;"></div>
+          <div class="cards-row">
+            <div class="stat-card">
+              <h3 data-i18n="activeMembers">Active Members</h3>
+              <p id="stat-members" class="stat-value">0</p>
+            </div>
+            <div class="stat-card">
+              <h3 data-i18n="revenue">Total Revenue</h3>
+              <p id="stat-revenue" class="stat-value">₹0</p>
+            </div>
+            <div class="stat-card">
+              <h3 data-i18n="attendanceTrend">Attendance (7 days)</h3>
+              <div id="attendance-bars" class="trend-bars"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- User Profile -->
+        <section id="panel-profile" class="panel slide-fade hidden">
+          <div class="panel-header">
+            <h2>My Profile</h2>
+          </div>
+          <div class="card">
+            <div id="profile-content">
+              <div style="display: grid; grid-template-columns: 200px 1fr; gap: 24px; margin-bottom: 24px;">
+                <div>
+                  <img id="profile-photo" src="" alt="Profile" style="width: 100%; border-radius: 12px; border: 2px solid rgba(88, 255, 222, 0.3);" />
+                  <input type="file" id="profile-photo-input" accept="image/*" style="margin-top: 8px; width: 100%;" />
+                </div>
+                <div>
+                  <h3 id="profile-name"></h3>
+                  <p id="profile-email"></p>
+                  <p id="profile-age"></p>
+                  <p id="profile-join-date"></p>
+                </div>
+              </div>
+              
+              <div class="card" style="background: rgba(88, 255, 222, 0.1); border: 1px solid rgba(88, 255, 222, 0.3); margin-bottom: 24px;">
+                <h4 style="margin-top: 0;">Profile Badge</h4>
+                <p><strong>Username:</strong> <code id="badge-username"></code></p>
+                <p><strong>Password:</strong> <code id="badge-password"></code></p>
+                <p><strong>Fee Status:</strong> <span id="badge-fee-status"></span></p>
+                <p><strong>Badges:</strong> <span id="badge-list"></span></p>
+                <p><strong>Videos Uploaded:</strong> <span id="badge-video-count">0</span></p>
+                <p><strong>Photos Uploaded:</strong> <span id="badge-photo-count">0</span></p>
+              </div>
+              
+              <div class="grid-2">
+                <div class="input-group">
+                  <label>Fitness Goal</label>
+                  <input id="profile-fitness-goal" type="text" />
+                </div>
+                <div class="input-group">
+                  <label>Membership Type</label>
+                  <input id="profile-membership" type="text" />
+                </div>
+                <div class="input-group">
+                  <label>Fee Pay Date</label>
+                  <input id="profile-fee-pay-date" type="date" />
+                </div>
+                <div class="input-group">
+                  <label>Fee End Date</label>
+                  <input id="profile-fee-end-date" type="date" />
+                </div>
+              </div>
+              <button id="save-profile-btn" class="glow-button" style="margin-top: 16px;">Save Profile</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Members -->
+        <section id="panel-members" class="panel slide-fade hidden">
+          <div class="panel-header">
+            <h2 data-i18n="membersTitle">Member Management</h2>
+            <button id="add-member-btn" class="glow-button" data-i18n="addMember">
+              Add Member
+            </button>
+          </div>
+          <div id="member-form-card" class="card small hidden zoom-in">
+            <form id="member-form">
+              <div class="grid-2">
+                <div class="input-group">
+                  <label data-i18n="name">Name</label>
+                  <input name="name" required />
+                </div>
+                <div class="input-group">
+                  <label data-i18n="age">Age</label>
+                  <input name="age" type="number" required />
+                </div>
+              </div>
+              <div class="input-group">
+                <label>Email</label>
+                <input name="email" type="email" />
+              </div>
+              <div class="input-group">
+                <label>Fitness Goal</label>
+                <input name="fitnessGoal" type="text" />
+              </div>
+              <div class="input-group">
+                <label data-i18n="membershipType">Membership</label>
+                <input name="membershipType" required />
+              </div>
+              <div class="grid-2">
+                <div class="input-group">
+                  <label>Fee Pay Date</label>
+                  <input name="feePayDate" type="date" />
+                </div>
+                <div class="input-group">
+                  <label>Fee End Date</label>
+                  <input name="feeEndDate" type="date" />
+                </div>
+              </div>
+              <div class="input-group">
+                <label data-i18n="paymentStatus">Payment Status</label>
+                <select name="paymentStatus">
+                  <option value="paid" data-i18n="paid">Paid</option>
+                  <option value="due" data-i18n="due">Due</option>
+                </select>
+              </div>
+              <button class="glow-button" type="submit" data-i18n="save">Save</button>
+            </form>
+          </div>
+          <div class="card table-card">
+            <table class="members-table">
+              <thead>
+                <tr>
+                  <th data-i18n="name">Name</th>
+                  <th data-i18n="age">Age</th>
+                  <th>Join Date</th>
+                  <th>Fee Pay Date</th>
+                  <th>Fee End Date</th>
+                  <th data-i18n="membershipType">Membership</th>
+                  <th data-i18n="paymentStatus">Payment</th>
+                  <th>Trainer</th>
+                  <th data-i18n="actions">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="members-table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Trainers -->
+        <section id="panel-trainers" class="panel slide-fade hidden">
+          <div class="panel-header">
+            <h2 data-i18n="trainersTitle">Trainer Management</h2>
+            <button id="add-trainer-btn" class="glow-button" data-i18n="addTrainer">
+              Add Trainer
+            </button>
+          </div>
+          <div id="trainer-form-card" class="card small hidden zoom-in">
+            <form id="trainer-form">
+              <div class="grid-3">
+                <div class="input-group">
+                  <label data-i18n="name">Name</label>
+                  <input name="name" required />
+                </div>
+                <div class="input-group">
+                  <label data-i18n="specialty">Specialty</label>
+                  <input name="specialty" />
+                </div>
+                <div class="input-group">
+                  <label data-i18n="schedule">Schedule</label>
+                  <input name="schedule" />
+                </div>
+              </div>
+              <button class="glow-button" type="submit" data-i18n="save">Save</button>
+            </form>
+          </div>
+          <div class="card table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="name">Name</th>
+                  <th data-i18n="specialty">Specialty</th>
+                  <th data-i18n="schedule">Schedule</th>
+                </tr>
+              </thead>
+              <tbody id="trainers-table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Workout Plans -->
+        <section id="panel-workouts" class="panel slide-fade hidden">
+          <div class="panel-header">
+            <h2 data-i18n="workoutsTitle">Workout Plans</h2>
+          </div>
+          <div class="cards-row">
+            <div class="card small flip-card">
+              <h3 data-i18n="createWorkout">Create Workout Plan</h3>
+              <form id="workout-form">
+                <div class="grid-2">
+                  <div class="input-group">
+                    <label data-i18n="workoutName">Workout Name</label>
+                    <input name="name" required />
+                  </div>
+                  <div class="input-group">
+                    <label data-i18n="workoutType">Type</label>
+                    <input name="workoutType" placeholder="Chest / Legs / Cardio" />
+                  </div>
+                </div>
+                <div class="grid-2">
+                  <div class="input-group">
+                    <label data-i18n="reps">Reps</label>
+                    <input name="reps" required />
+                  </div>
+                  <div class="input-group">
+                    <label data-i18n="sets">Sets</label>
+                    <input name="sets" required />
+                  </div>
+                </div>
+                <button class="glow-button" type="submit" data-i18n="save">
+                  Save Plan
+                </button>
+              </form>
+            </div>
+            <div class="card small flip-card">
+              <h3 data-i18n="uploadWorkoutVideo">Upload Workout Video</h3>
+              <p>Share your workout videos with the community!</p>
+              <button id="go-to-videos" class="glow-button" style="width: 100%;">Go to Video Gallery</button>
+            </div>
+          </div>
+
+          <h3 class="mt" data-i18n="availableWorkouts">Available Workout Plans</h3>
+          <div id="workout-cards" class="card-grid"></div>
+        </section>
+
+        <!-- Video Gallery -->
+        <section id="panel-videos" class="panel slide-fade hidden">
+          <div class="panel-header">
+            <h2 data-i18n="videoGalleryTitle">Workout Video Gallery</h2>
+            <div>
+              <select id="video-filter" class="filter-select">
+                <option value="" data-i18n="all">All Types</option>
+                <option value="Chest">Chest</option>
+                <option value="Back">Back</option>
+                <option value="Legs">Legs</option>
+                <option value="Cardio">Cardio</option>
+              </select>
+            </div>
+          </div>
+          <div class="cards-row" style="margin-bottom: 20px;">
+            <div class="card">
+              <h3>Upload Workout Video</h3>
+              <form id="video-upload-form" enctype="multipart/form-data">
+                <div class="grid-2">
+                  <div class="input-group">
+                    <label>Title</label>
+                    <input name="title" required />
+                  </div>
+                  <div class="input-group">
+                    <label>Workout Type</label>
+                    <input name="workoutType" />
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label>Video File</label>
+                  <input type="file" name="video" accept="video/*" required />
+                </div>
+                <button class="glow-button" type="submit">Upload Video</button>
+              </form>
+            </div>
+          </div>
+          <div id="video-gallery" class="masonry-grid"></div>
+          <div id="video-modal" class="modal hidden">
+            <div class="modal-content zoom-in">
+              <span id="video-modal-close" class="modal-close">&times;</span>
+              <video id="modal-video-player" controls autoplay playsinline></video>
+            </div>
+          </div>
+        </section>
+
+        <!-- Photo Gallery -->
+        <section id="panel-photos" class="panel slide-fade hidden">
+          <div class="panel-header">
+            <h2 data-i18n="photoGalleryTitle">Transformation Photo Gallery</h2>
+          </div>
+          <div class="cards-row" style="margin-bottom: 20px;">
+            <div class="card">
+              <h3>Upload Your Transformation Photo</h3>
+              <form id="photo-upload-form" enctype="multipart/form-data">
+                <div class="grid-2">
+                  <div class="input-group">
+                    <label>Title (optional)</label>
+                    <input name="title" />
+                  </div>
+                  <div class="input-group">
+                    <label>Caption (optional)</label>
+                    <input name="caption" />
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label>Photo</label>
+                  <input type="file" name="photo" accept="image/*" required />
+                </div>
+                <button class="glow-button" type="submit">Upload Photo</button>
+              </form>
+              <p class="hint" style="color: #58ffde;">
+                Photos appear immediately in the gallery.
+              </p>
+            </div>
+          </div>
+            <div class="card gallery-card">
+              <div id="photo-gallery" class="photo-grid"></div>
+            </div>
+          </div>
+          <div id="photo-modal" class="modal hidden">
+            <div class="modal-content zoom-in">
+              <span id="photo-modal-close" class="modal-close">&times;</span>
+              <img id="modal-photo" alt="Photo" />
+            </div>
+          </div>
+        </section>
+
+        <!-- Group Chat -->
+        <section id="panel-chat" class="panel slide-fade hidden">
+          <h2 data-i18n="chatTitle">Gym Group Chat</h2>
+          <div class="chat-container card">
+            <div id="chat-messages" class="chat-messages"></div>
+            <div id="chat-typing" class="typing-indicator hidden">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+            <form id="chat-form" class="chat-input-row">
+              <input
+                id="chat-input"
+                type="text"
+                placeholder="Type a message..."
+                autocomplete="off"
+              />
+              <button class="glow-button" type="submit">Send</button>
+            </form>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+  </body>
+  </html>
+
